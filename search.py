@@ -150,14 +150,26 @@ class _RecursiveDepthFirstSearch(object):
 		'''
 		"Start of Your Code"
 		if self.problem.isGoalState(node):
-			return self.actions
+			return True
+		else:
+			self.explored.add(node)
+			successors = self.problem.getSuccessors(node)
+			if successors is None:
+				return False
+			else:
+				for a_triple in successors:
+					if a_triple[0] not in self.explored:
+						self.actions.append(a_triple[1])
+						reply = RecursiveDepthFirstSearchHelper(a_triple[0])
+						if reply == False:
+
+
 		else:
 			self.explored.add(node)
 			successors = self.problem.getSuccessors(node)
 			if successors:
-				for a_triple in successors:
-					if a_triple[0] not in self.explored:
-						reply = RecursiveDepthFirstSearchHelper(a_triple[0])
+				
+
 
 
 		"End of Your Code"
