@@ -186,7 +186,37 @@ def depthLimitedSearch(problem, limit = 129):
 		"""
 
 	"Start of Your Code"
-	pass
+	frontier = util.Stack()
+	explored_set = set()
+	depth = 0
+
+	initial_state = problem.getStartState()
+	if problem.isGoalState(initial_state):
+		return []
+
+	frontier.push((initial_state,[],depth))
+	while True:
+		if frontier.isEmpty():
+			return []
+		
+		coord, act_seq, depth = frontier.pop()
+		if problem.isGoalState(coord):
+			return act_seq
+
+		if coord not in explored_set:
+			print('depth ',depth)
+			explored_set.add(coord)
+			successors = problem.getSuccessors(coord)
+			if successors:
+				if depth <= limit:
+					for a_triple in successors:
+						if a_triple[0] not in explored_set:
+							path = list()
+							if act_seq != []:
+								for val in act_seq:
+									path.append(val)
+							path.append(a_triple[1])
+							frontier.push((a_triple[0], path, depth + 1))
 	"End of Your Code"
 
 # ________________________________________________________________
@@ -346,21 +376,22 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 	'''
 	"Start of Your Code"
-	frontier = util.PriorityQueueWithFunction(heuristic)
-	frontier_copy = list()
+	frontier = util.PriorityQueue()
 	explored_set = set()
+	frontier_copy = list()
 	initial_state = problem.getStartState()
-	frontier.push((initial_state,[]))
+	frontier.push((initial_state,[],0),heuristic(initial_state,problem))
 	frontier_copy.append(initial_state)
 
 	while True:
 		if frontier.isEmpty():
 			return []
 		
-		node, priority = frontier.pop()
+		node, fn = frontier.pop()
 		frontier_copy.remove(node[0])
 
 		act_seq = node[1]
+		gn = node[2]
 		if problem.isGoalState(node[0]):
 			return act_seq
 
@@ -371,16 +402,16 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 			for a_triple in successors:
 				successor_coord = a_triple[0]
 				successor_direction = a_triple[1]
-				successor_path_cost = priority + a_triple[2]
+				successor_path_cost = gn + a_triple[2] + heuristic(successor_coord,problem)
 				path = list()
 				if act_seq != []:
 					for direction in act_seq:
 						path.append(direction)
 				path.append(successor_direction)
-				successor_info = (successor_coord,path)
+				successor_info = (successor_coord,path,a_triple[2] + gn)
 
 				if successor_coord not in explored_set and successor_coord not in frontier_copy:
-					frontier.push(successor_info)
+					frontier.push(successor_info,successor_path_cost)
 					frontier_copy.append(successor_coord)
 				elif frontier.item_present_with_higher_priority(successor_info, successor_path_cost) != None:
 					index, c = frontier.item_present_with_higher_priority(successor_info, successor_path_cost)
