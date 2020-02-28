@@ -149,7 +149,17 @@ class _RecursiveDepthFirstSearch(object):
 		outputs: bool => True if path found else Fasle.
 		'''
 		"Start of Your Code"
-		pass
+		if self.problem.isGoalState(node):
+			return self.actions
+		else:
+			self.explored.add(node)
+			successors = self.problem.getSuccessors(node)
+			if successors:
+				for a_triple in successors:
+					if a_triple[0] not in self.explored:
+						reply = RecursiveDepthFirstSearchHelper(a_triple[0])
+
+
 		"End of Your Code"
 
 
@@ -165,7 +175,7 @@ def RecursiveDepthFirstSearch(problem):
 # ________________________________________________________________
 
 
-def depthLimitedSearch(problem, limit = 129):
+def depthLimitedSearch(problem, limit = 210):
 
 	"""
 	Search the deepest nodes in the search tree first as long as the
@@ -204,7 +214,6 @@ def depthLimitedSearch(problem, limit = 129):
 			return act_seq
 
 		if coord not in explored_set:
-			print('depth ',depth)
 			explored_set.add(coord)
 			successors = problem.getSuccessors(coord)
 			if successors:
